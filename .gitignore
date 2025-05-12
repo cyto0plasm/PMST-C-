@@ -1,0 +1,28 @@
+# Build folders
+x64/
+Debug/
+Release/
+*.obj
+*.exe
+*.dll
+*.pdb
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.VC.db
+*.VC.opendb
+
+# Other trash
+ipch/
+*.log
+*.tlog
+*.cache
+*.ncb
+*.aps
+*.tmp
+*.class
+*.pyc
+PMST/bin/
+PMST/obj/
