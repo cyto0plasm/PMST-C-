@@ -12,6 +12,7 @@ namespace PMST {
 
         static InvoiceHeaderModel^ Create(InvoiceHeaderModel^ m);
         static InvoiceHeaderModel^ GetById(int id);
+        static System::Collections::Generic::List<InvoiceHeaderModel^>^ InvoiceHeaderController::GetByPharmacy(int pharmacyId);
         static System::Collections::Generic::List<InvoiceHeaderModel^>^ GetAll();
         static bool Update(InvoiceHeaderModel^ m);
         static bool Delete(int id);

@@ -21,5 +21,6 @@ namespace PMST {
         static List<CategoryModel^>^ GetByPharmacy(int pharmacyId);
         static bool Update(CategoryModel^ m);
         static bool Delete(int id);
+
     };
 }

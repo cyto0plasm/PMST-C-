@@ -2,217 +2,219 @@
 #include "../Database/DBConnection.h"
 #include "../Models/UserModel.h"
 
-
 namespace PMST {
 
-	// ---- Helpers ----
+    // ---- Helpers ----
 
-	String^ UserController::HashPassword(String^ plain) {
-		auto sha = SHA256::Create();
-		array<Byte>^ bytes = Encoding::UTF8->GetBytes(plain);
-		array<Byte>^ hash = sha->ComputeHash(bytes);
+    String^ UserController::HashPassword(String^ plain) {
+        auto sha = SHA256::Create();
+        array<Byte>^ bytes = Encoding::UTF8->GetBytes(plain);
+        array<Byte>^ hash = sha->ComputeHash(bytes);
 
-		// Convert to hex string
-		StringBuilder^ sb = gcnew StringBuilder();
-		for each (Byte b in hash)
-			sb->Append(b.ToString("x2"));
+        // Convert to hex string
+        StringBuilder^ sb = gcnew StringBuilder();
+        for each (Byte b in hash)
+            sb->Append(b.ToString("x2"));
 
-		return sb->ToString();
-	}
+        return sb->ToString();
+    }
 
-	void UserController::ValidateUserModel(UserModel^ user, bool requireId) {
-		if (requireId && user->Id <= 0)
-			throw gcnew ArgumentException("Invalid user Id.");
+    void UserController::ValidateUserModel(UserModel^ user, bool requireId) {
+        if (requireId && user->Id <= 0)
+            throw gcnew ArgumentException("Invalid user Id.");
 
-		if (String::IsNullOrWhiteSpace(user->Username))
-			throw gcnew ArgumentException("Username cannot be empty.");
+        if (String::IsNullOrWhiteSpace(user->Username))
+            throw gcnew ArgumentException("Username cannot be empty.");
 
-		if (String::IsNullOrWhiteSpace(user->Email) || !user->Email->Contains("@"))
-			throw gcnew ArgumentException("Invalid email address.");
-	}
+        if (String::IsNullOrWhiteSpace(user->Email) || !user->Email->Contains("@"))
+            throw gcnew ArgumentException("Invalid email address.");
+    }
 
-	// ---- Register & Login ----
+    // ---- Register & Login ----
 
-	UserModel^ UserController::Register(String^ username, String^ password, String^ email) {
-		if (password->Length < 6)
-			throw gcnew ArgumentException("Password must be at least 6 characters.");
+    UserModel^ UserController::Register(String^ username, String^ password, String^ email) {
+        if (password->Length < 6)
+            throw gcnew ArgumentException("Password must be at least 6 characters.");
 
-		// Check for existing user
-		if (Login(username, password) != nullptr)
-			throw gcnew InvalidOperationException("User already exists.");
+        // Check for existing user
+        if (Login(username, password) != nullptr)
+            throw gcnew InvalidOperationException("User already exists.");
 
-		UserModel^ newUser = gcnew UserModel();
-		newUser->Username = username;
-		newUser->Password = HashPassword(password);
-		newUser->Email = email;
-		newUser->Created_At = DateTime::Now;
-		newUser->Updated_At = DateTime::Now;
+        UserModel^ newUser = gcnew UserModel();
+        newUser->Username = username;
+        newUser->Password = HashPassword(password);
+        newUser->Email = email;
+        newUser->Created_At = DateTime::Now;
+        newUser->Updated_At = DateTime::Now;
+        newUser->ImagePath = ""; // Default image path (empty)
 
-		return Create(newUser);
-	}
+        return Create(newUser);
+    }
 
-	UserModel^ UserController::Login(String^ usernameOrEmail, String^ password) {
-		String^ hashed = HashPassword(password);
-		SQLiteDataReader^ reader = nullptr;
-		auto conn = DBConnection::GetConnection();
-		conn->Open();
+    UserModel^ UserController::Login(String^ usernameOrEmail, String^ password) {
+        String^ hashed = HashPassword(password);
+        SQLiteDataReader^ reader = nullptr;
+        auto conn = DBConnection::GetConnection();
+        conn->Open();
 
-		try {
-			auto cmd = gcnew SQLiteCommand(
-				"SELECT id, username, Password, email, created_at, updated_at "
-				"FROM users WHERE (username = @u OR email = @u) AND Password = @p;",
-				conn);
-			cmd->Parameters->AddWithValue("@u", usernameOrEmail);
-			cmd->Parameters->AddWithValue("@p", hashed);
+        try {
+            auto cmd = gcnew SQLiteCommand(
+                "SELECT id, username, Password, email, created_at, updated_at, image_path "
+                "FROM users WHERE (username = @u OR email = @u) AND Password = @p;",
+                conn);
+            cmd->Parameters->AddWithValue("@u", usernameOrEmail);
+            cmd->Parameters->AddWithValue("@p", hashed);
 
-			reader = cmd->ExecuteReader();
-			if (reader->Read()) {
-				auto u = gcnew UserModel();
-				u->Id = reader->GetInt32(0);
-				u->Username = reader->GetString(1);
-				u->Password = reader->GetString(2);
-				u->Email = reader->GetString(3);
-				u->Created_At = reader->GetDateTime(4);
-				u->Updated_At = reader->GetDateTime(5);	
-				return u;
-			}
-			return nullptr;
-		}
-		finally {
-			if (reader != nullptr && !reader->IsClosed)
-				reader->Close();
-			conn->Close();
-		}
-	}
+            reader = cmd->ExecuteReader();
+            if (reader->Read()) {
+                auto u = gcnew UserModel();
+                u->Id = reader->GetInt32(0);
+                u->Username = reader->GetString(1);
+                u->Password = reader->GetString(2);
+                u->Email = reader->GetString(3);
+                u->Created_At = reader->GetDateTime(4);
+                u->Updated_At = reader->GetDateTime(5);
+                u->ImagePath = reader->IsDBNull(6) ? "" : reader->GetString(6);  // Fetch image path
+                return u;
+            }
+            return nullptr;
+        }
+        finally {
+            if (reader != nullptr && !reader->IsClosed)
+                reader->Close();
+            conn->Close();
+        }
+    }
 
+    // ---- CRUD operations ----
 
-	
+    UserModel^ UserController::Create(UserModel^ user) {
+        ValidateUserModel(user, false);
 
-	// ---- CRUD operations ----
+        auto conn = DBConnection::GetConnection();
+        conn->Open();
 
-	UserModel^ UserController::Create(UserModel^ user) {
-		ValidateUserModel(user, false);
+        auto cmd = gcnew SQLiteCommand(
+            "INSERT INTO users (username, Password, email, created_at, updated_at, image_path) "
+            "VALUES (@u, @p, @e, @c, @uT, @imgPath); "
+            "SELECT last_insert_rowid();",
+            conn);
 
-		auto conn = DBConnection::GetConnection();
-		conn->Open();
+        cmd->Parameters->AddWithValue("@u", user->Username);
+        cmd->Parameters->AddWithValue("@p", user->Password);
+        cmd->Parameters->AddWithValue("@e", user->Email);
+        cmd->Parameters->AddWithValue("@c", user->Created_At);
+        cmd->Parameters->AddWithValue("@uT", user->Updated_At);
+        cmd->Parameters->AddWithValue("@imgPath", user->ImagePath); // Save the image path (could be empty)
 
-		auto cmd = gcnew SQLiteCommand(
-			"INSERT INTO users (username, Password, email, created_at, updated_at) "
-			"VALUES (@u, @p, @e, @c, @uT); "
-			"SELECT last_insert_rowid();",
-			conn);
+        Int64 id = (Int64)cmd->ExecuteScalar();
+        conn->Close();
 
-		cmd->Parameters->AddWithValue("@u", user->Username);
-		cmd->Parameters->AddWithValue("@p", user->Password);
-		cmd->Parameters->AddWithValue("@e", user->Email);
-		cmd->Parameters->AddWithValue("@c", user->Created_At);
-		cmd->Parameters->AddWithValue("@uT", user->Updated_At);
+        user->Id = safe_cast<int>(id);
+        return user;
+    }
 
-		Int64 id = (Int64)cmd->ExecuteScalar();
-		conn->Close();
+    UserModel^ UserController::GetById(int id) {
+        if (id <= 0) return nullptr;
 
-		user->Id = safe_cast<int>(id);
-		return user;
-	}
+        SQLiteDataReader^ reader = nullptr;
+        auto conn = DBConnection::GetConnection();
+        conn->Open();
 
-	UserModel^ UserController::GetById(int id) {
-		if (id <= 0) return nullptr;
+        try {
+            auto cmd = gcnew SQLiteCommand(
+                "SELECT id, username, Password, email, created_at, updated_at, image_path "
+                "FROM users WHERE id = @id;",
+                conn);
+            cmd->Parameters->AddWithValue("@id", id);
 
-		SQLiteDataReader^ reader = nullptr;
-		auto conn = DBConnection::GetConnection();
-		conn->Open();
+            reader = cmd->ExecuteReader();
+            if (reader->Read()) {
+                auto u = gcnew UserModel();
+                u->Id = reader->GetInt32(0);
+                u->Username = reader->GetString(1);
+                u->Password = reader->GetString(2);
+                u->Email = reader->GetString(3);
+                u->Created_At = reader->GetDateTime(4);
+                u->Updated_At = reader->GetDateTime(5);
+                u->ImagePath = reader->IsDBNull(6) ? "" : reader->GetString(6);  // Fetch image path
+                return u;
+            }
+            return nullptr;
+        }
+        finally {
+            if (reader != nullptr && !reader->IsClosed)
+                reader->Close();
+            conn->Close();
+        }
+    }
 
-		try {
-			auto cmd = gcnew SQLiteCommand(
-				"SELECT id, username, Password, email, created_at, updated_at "
-				"FROM users WHERE id = @id;",
-				conn);
-			cmd->Parameters->AddWithValue("@id", id);
+    List<UserModel^>^ UserController::GetAll() {
+        auto list = gcnew List<UserModel^>();
+        SQLiteDataReader^ reader = nullptr;
+        auto conn = DBConnection::GetConnection();
+        conn->Open();
 
-			reader = cmd->ExecuteReader();
-			if (reader->Read()) {
-				auto u = gcnew UserModel();
-				u->Id = reader->GetInt32(0);
-				u->Username = reader->GetString(1);
-				u->Password = reader->GetString(2);
-				u->Email = reader->GetString(3);
-				u->Created_At = reader->GetDateTime(4);
-				u->Updated_At = reader->GetDateTime(5);
-				return u;
-			}
-			return nullptr;
-		}
-		finally {
-			if (reader != nullptr && !reader->IsClosed)
-				reader->Close();
-			conn->Close();
-		}
-	}
+        try {
+            auto cmd = gcnew SQLiteCommand(
+                "SELECT id, username, Password, email, created_at, updated_at, image_path FROM users;",
+                conn);
 
-	List<UserModel^>^ UserController::GetAll() {
-		auto list = gcnew List<UserModel^>();
-		SQLiteDataReader^ reader = nullptr;
-		auto conn = DBConnection::GetConnection();
-		conn->Open();
+            reader = cmd->ExecuteReader();
+            while (reader->Read()) {
+                auto u = gcnew UserModel();
+                u->Id = reader->GetInt32(0);
+                u->Username = reader->GetString(1);
+                u->Password = reader->GetString(2);
+                u->Email = reader->GetString(3);
+                u->Created_At = reader->GetDateTime(4);
+                u->Updated_At = reader->GetDateTime(5);
+                u->ImagePath = reader->IsDBNull(6) ? "" : reader->GetString(6);  // Fetch image path
+                list->Add(u);
+            }
+            return list;
+        }
+        finally {
+            if (reader != nullptr && !reader->IsClosed)
+                reader->Close();
+            conn->Close();
+        }
+    }
 
-		try {
-			auto cmd = gcnew SQLiteCommand(
-				"SELECT id, username, Password, email, created_at, updated_at FROM users;",
-				conn);
+    bool UserController::Update(UserModel^ user) {
+        ValidateUserModel(user, true);
+        user->Updated_At = DateTime::Now;
 
-			reader = cmd->ExecuteReader();
-			while (reader->Read()) {
-				auto u = gcnew UserModel();
-				u->Id = reader->GetInt32(0);
-				u->Username = reader->GetString(1);
-				u->Password = reader->GetString(2);
-				u->Email = reader->GetString(3);
-				u->Created_At = reader->GetDateTime(4);
-				u->Updated_At = reader->GetDateTime(5);
-				list->Add(u);
-			}
-			return list;
-		}
-		finally {
-			if (reader != nullptr && !reader->IsClosed)
-				reader->Close();
-			conn->Close();
-		}
-	}
+        auto conn = DBConnection::GetConnection();
+        conn->Open();
 
-	bool UserController::Update(UserModel^ user) {
-		ValidateUserModel(user, true);
-		user->Updated_At = DateTime::Now;
+        auto cmd = gcnew SQLiteCommand(
+            "UPDATE users SET username=@u, email=@e, Password=@p, updated_at=@uT, image_path=@imgPath WHERE id=@id;",
+            conn);
 
-		auto conn = DBConnection::GetConnection();
-		conn->Open();
+        cmd->Parameters->AddWithValue("@u", user->Username);
+        cmd->Parameters->AddWithValue("@e", user->Email);
+        cmd->Parameters->AddWithValue("@p", user->Password);
+        cmd->Parameters->AddWithValue("@uT", user->Updated_At);
+        cmd->Parameters->AddWithValue("@imgPath", user->ImagePath); // Save the image path
+        cmd->Parameters->AddWithValue("@id", user->Id);
 
-		auto cmd = gcnew SQLiteCommand(
-			"UPDATE users SET username=@u, email=@e, Password=@p, updated_at=@uT WHERE id=@id;",
-			conn);
+        int rows = cmd->ExecuteNonQuery();
+        conn->Close();
+        return rows > 0;
+    }
 
-		cmd->Parameters->AddWithValue("@u", user->Username);
-		cmd->Parameters->AddWithValue("@e", user->Email);
-		cmd->Parameters->AddWithValue("@p", user->Password);
-		cmd->Parameters->AddWithValue("@uT", user->Updated_At);
-		cmd->Parameters->AddWithValue("@id", user->Id);
+    bool UserController::Delete(int id) {
+        if (id <= 0) return false;
 
-		int rows = cmd->ExecuteNonQuery();
-		conn->Close();
-		return rows > 0;
-	}
+        auto conn = DBConnection::GetConnection();
+        conn->Open();
 
-	bool UserController::Delete(int id) {
-		if (id <= 0) return false;
+        auto cmd = gcnew SQLiteCommand("DELETE FROM users WHERE id = @id;", conn);
+        cmd->Parameters->AddWithValue("@id", id);
 
-		auto conn = DBConnection::GetConnection();
-		conn->Open();
-
-		auto cmd = gcnew SQLiteCommand("DELETE FROM users WHERE id = @id;", conn);
-		cmd->Parameters->AddWithValue("@id", id);
-
-		int rows = cmd->ExecuteNonQuery();
-		conn->Close();
-		return rows > 0;
-	}
+        int rows = cmd->ExecuteNonQuery();
+        conn->Close();
+        return rows > 0;
+    }
 }

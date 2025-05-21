@@ -1,4 +1,5 @@
 #include "SuppliersController.h"
+#include "../Models/SupplierModel.h"
 #include "../Database/DBConnection.h"
 
 namespace PMST {
@@ -189,5 +190,6 @@ namespace PMST {
             conn->Close();
         }
     }
+    
 
 }  // namespace PMST

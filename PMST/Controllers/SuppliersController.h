@@ -22,6 +22,9 @@ namespace PMST {
         static List<SupplierModel^>^ GetByPharmacy(int pharmacyId);
         static bool Update(SupplierModel^ m);
         static bool Delete(int id);
+
+
+
         //static List<SupplierModel^>^ SupplierController::FetchList(String^ sql, Action<SQLiteCommand^>^ paramAction);
         //static SupplierModel^ SupplierController::ReadSupplier(SQLiteDataReader^ rd);
 

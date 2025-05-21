@@ -26,5 +26,9 @@ namespace PMST {
         static List<ProductModel^>^ GetByPharmacy(int pharmacyId);
         static bool Update(ProductModel^ m);
         static bool Delete(int id);
+
+
+    public:Dictionary<String^, float>^ GetProductQuantityByCategory(int pharmacyId);
+    public:Dictionary<String^, float>^ GetProductValueByCategory(int pharmacyId);
     };
 }

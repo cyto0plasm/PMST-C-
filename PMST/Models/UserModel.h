@@ -10,5 +10,6 @@ namespace PMST {
         property String^ Email;
         property DateTime Created_At;
         property DateTime Updated_At;
+        String^ ImagePath;
     };
 }

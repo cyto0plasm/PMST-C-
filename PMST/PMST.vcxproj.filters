@@ -78,6 +78,18 @@
     <ClCompile Include="Controllers\InvoiceHeaderController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Forms\Profile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Forms\calculator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Forms\Helper\PieChartPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\UIHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="x64\Debug\PMST.vcxproj.AssemblyReference.cache" />
@@ -89,6 +101,7 @@
     <None Include="lib\System.Data.SQLite.dll" />
     <None Include="lib\System.Data.SQLite.dll.config" />
     <None Include="pharmacy_management_system.db" />
+    <None Include="..\x64\Debug\MySql.Data.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Forms\Dashboard.h">
@@ -151,15 +164,28 @@
     <ClInclude Include="Controllers\InvoiceHeaderController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Forms\Profile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Forms\calculator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Forms\Theme\AuthTheme.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Forms\Helper\PieChartPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\UIHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="x64\Debug\PMST.log" />
-    <Text Include="x64\Debug\PMST.Build.CppClean.log" />
     <Text Include="x64\Debug\PMST.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="x64\Debug\.NETFramework,Version=v4.8.AssemblyAttributes.obj" />
-    <Object Include="x64\Debug\Dashboard.obj" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Images\logo.ico">

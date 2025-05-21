@@ -8,9 +8,13 @@ ref class DBConnection
 {
 private:
     //static String^ connectionString = "Data Source=pharmacy_management_system.db;Version=3;";
-    static String^ connectionString = "Data Source=D:\\pmstgithub\\PMST\\x64\\Debug\\pharmacy_management_system2.db;Version=3;Foreign Keys=True;";
+    static String^ connectionString = "Data Source=D:\\pmstgithub\\PMST\\x64\\Debug\\pharmacy_management_system3.db;Version=3;Foreign Keys=True;";
 public:
     static SQLiteConnection^ GetConnection();
+    static SQLiteConnection^ DBConnection::GetOpenConnection();
+    static bool DBConnection::IsConnectionOpen(SQLiteConnection^ conn);
+    static void DBConnection::ResetDatabase();
+
 };
 
 

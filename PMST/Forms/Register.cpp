@@ -1,12 +1,17 @@
 #include "Register.h"
 #include "Dashboard.h"
-
+#include "Theme/AuthTheme.h"
 namespace PMST {
 Register::Register(void) {
 	InitializeComponent();
+	LightTheme = AuthTheme::CreateLightTheme();
+	DarkTheme = AuthTheme::CreateDarkTheme();
+	currentTheme = LightTheme;
+	AuthTheme::ApplyTheme(currentTheme, this);
 }
 
 Register::~Register() {
+
 	if (components) delete components;
 }
 
@@ -58,3 +63,4 @@ void Register::NavToLoginBtn_Click(System::Object^ sender, System::EventArgs^ e)
 	loginForm->ShowDialog();
 }
 }
+

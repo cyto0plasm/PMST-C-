@@ -130,4 +130,27 @@ namespace PMST {
         }
         conn->Close(); return list;
     }
+    Dictionary<String^, float>^ SaleController::GetSalesByProductName(int pharmacyId)
+    {
+        auto sales = PMST::SaleController::GetByPharmacy(pharmacyId);
+        auto data = gcnew Dictionary<String^, float>();
+
+        auto conn = DBConnection::GetConnection();
+        conn->Open();
+
+        for each (PMST::SaleModel ^ sale in sales) {
+            auto cmd = gcnew System::Data::SQLite::SQLiteCommand("SELECT name FROM products WHERE id=@id;", conn);
+            cmd->Parameters->AddWithValue("@id", sale->Product_Id);
+            auto name = (String^)cmd->ExecuteScalar();
+
+            if (!data->ContainsKey(name))
+                data[name] = 0;
+            data[name] += static_cast<float>(sale->Total_Price);
+        }
+
+        conn->Close();
+        return data;
+
+
+    }
 }

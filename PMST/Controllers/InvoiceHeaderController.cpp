@@ -83,6 +83,39 @@ namespace PMST {
             conn->Close();
         }
     }
+    System::Collections::Generic::List<InvoiceHeaderModel^>^ InvoiceHeaderController::GetByPharmacy(int pharmacyId) {
+        if (pharmacyId <= 0) return nullptr;
+
+        auto list = gcnew System::Collections::Generic::List<InvoiceHeaderModel^>();
+        auto conn = DBConnection::GetConnection();
+        conn->Open();
+        SQLiteDataReader^ rd = nullptr;
+
+        try {
+            auto cmd = gcnew SQLiteCommand(
+                "SELECT Id, Pharmacy_Id, User_Id, Total_Price, Created_At, Updated_At "
+                "FROM invoice_Header WHERE Pharmacy_Id = @pharmacyId;", conn);
+            cmd->Parameters->AddWithValue("@pharmacyId", pharmacyId);
+
+            rd = cmd->ExecuteReader();
+            while (rd->Read()) {
+                auto m = gcnew InvoiceHeaderModel();
+                m->Id = rd->GetInt32(0);
+                m->Pharmacy_Id = rd->GetInt32(1);
+                m->User_Id = rd->GetInt32(2);
+                m->Total_Price = rd->GetDecimal(3);
+                m->Created_At = rd->GetDateTime(4);
+                m->Updated_At = rd->GetDateTime(5);
+                list->Add(m);
+            }
+            return list;
+        }
+        finally {
+            if (rd != nullptr && !rd->IsClosed)
+                rd->Close();
+            conn->Close();
+        }
+    }
 
     System::Collections::Generic::List<InvoiceHeaderModel^>^ InvoiceHeaderController::GetAll() {
         auto list = gcnew System::Collections::Generic::List<InvoiceHeaderModel^>();

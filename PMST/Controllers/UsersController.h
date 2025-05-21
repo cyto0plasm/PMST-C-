@@ -13,7 +13,7 @@ namespace PMST {
 
     public ref class UserController
     {
-    private:
+    public:
         // Hash a plain text password with SHA256
         static String^ HashPassword(String^ plain);
 

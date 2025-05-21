@@ -50,7 +50,6 @@ int main(array<String^>^ args)
 	//}
 
 
-
 	// Only run app if connection is fine
 	try
 	{

@@ -1,9 +1,14 @@
-	#include "Login.h"
+#include "Login.h"
 #include "Dashboard.h"
+#include "Theme/AuthTheme.h"
 
 namespace PMST {
 	Login::Login(void) {
 		InitializeComponent();
+		LightTheme = AuthTheme::CreateLightTheme();
+		DarkTheme = AuthTheme::CreateDarkTheme();
+		currentTheme = LightTheme;
+		AuthTheme::ApplyTheme(currentTheme, this);
 	}
 
 	Login::~Login() {
@@ -12,11 +17,11 @@ namespace PMST {
 	void Login::LoginBtn_Click(System::Object^ sender, System::EventArgs^ e) {
 		try {
 			// 1. Read inputs
-			String^ userOrEmail = this->usernameTextBox->Text;
+			String^ userName = this->usernameTextBox->Text;
 			String^ password = this->passwordTextBox->Text;
 
 			// 2. Attempt login
-			auto user = PMST::UserController::Login(userOrEmail, password);
+			auto user = PMST::UserController::Login(userName, password);
 			if (user == nullptr) {
 				MessageBox::Show(
 					"Invalid credentials.",
@@ -38,15 +43,7 @@ namespace PMST {
 			else {
 				MessageBox::Show("No pharmacies found!", "Error", MessageBoxButtons::OK, MessageBoxIcon::Warning);
 			}
-			// 4. Display or bind to UI (e.g., ListBox)
-			
-
-			MessageBox::Show(
-				"Welcome, " + user->Username + "!",
-				"Login Successful",
-				MessageBoxButtons::OK,
-				MessageBoxIcon::Information
-			);
+	
 
 		}
 		catch (Exception^ ex) {
@@ -56,15 +53,15 @@ namespace PMST {
 				MessageBoxButtons::OK,
 				MessageBoxIcon::Error
 			);
-			
-			
+
+
 		}
 	}
 
-		void Login::RegisterBtn_Click(System::Object^ sender, System::EventArgs^ e) {
-			this->Hide();
-			Register^ regForm = gcnew Register();
-			regForm->ShowDialog(this);                
-			
-		}
+	void Login::RegisterBtn_Click(System::Object^ sender, System::EventArgs^ e) {
+		this->Hide();
+		Register^ regForm = gcnew Register();
+		regForm->ShowDialog(this);
+
 	}
+}

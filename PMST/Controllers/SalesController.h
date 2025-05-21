@@ -21,5 +21,6 @@ namespace PMST {
         static SaleModel^ Create(SaleModel^ m);
         static List<SaleModel^>^ GetByPharmacy(int pharmacyId);
         static List<SaleModel^>^ GetByUser(int userId);
+        static Dictionary<String^, float>^ GetSalesByProductName(int pharmacyId);
     };
 }

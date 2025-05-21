@@ -141,10 +141,14 @@
     <ClCompile Include="Controllers\SuppliersController.cpp" />
     <ClCompile Include="Controllers\UsersController.cpp" />
     <ClCompile Include="Database\DBConnection.cpp" />
+    <ClCompile Include="Forms\calculator.cpp" />
     <ClCompile Include="Forms\Dashboard.cpp" />
+    <ClCompile Include="Forms\Helper\PieChartPanel.cpp" />
     <ClCompile Include="Forms\Login.cpp" />
     <ClCompile Include="Forms\main.cpp" />
+    <ClCompile Include="Forms\Profile.cpp" />
     <ClCompile Include="Forms\Register.cpp" />
+    <ClCompile Include="Helpers\UIHelper.cpp" />
     <ClCompile Include="Models\CategoryModel.cpp" />
     <ClCompile Include="Models\InvoiceHeaderModel.cpp" />
     <ClCompile Include="Models\PharmacyModel.cpp" />
@@ -167,13 +171,26 @@
     <ClInclude Include="Controllers\SuppliersController.h" />
     <ClInclude Include="Controllers\UsersController.h" />
     <ClInclude Include="Database\DBConnection.h" />
+    <ClInclude Include="Forms\calculator.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="Forms\Dashboard.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Forms\Helper\PieChartPanel.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Forms\Login.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="Forms\Profile.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="Forms\Register.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Forms\Theme\AuthTheme.h" />
+    <ClInclude Include="Helpers\UIHelper.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Models\CategoryModel.h" />
@@ -189,15 +206,30 @@
   </ItemGroup>
   <!-- Embed Dashboard resources with correct logical name -->
   <ItemGroup>
+    <EmbeddedResource Include="Forms\calculator.resx">
+      <DependentUpon>Forms\calculator.h</DependentUpon>
+      <LogicalName>PMST.calculator.resources</LogicalName>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Dashboard.resx">
       <DependentUpon>Forms\Dashboard.h</DependentUpon>
-      <LogicalName>$(RootNamespace).Dashboard.resources</LogicalName>
+      <LogicalName>PMST.Dashboard.resources</LogicalName>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Login.resx">
       <DependentUpon>Forms\Login.h</DependentUpon>
+      <LogicalName>PMST.Login.resources</LogicalName>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Profile.resx">
+      <DependentUpon>Forms\Profile.h</DependentUpon>
+      <LogicalName>PMST.Profile.resources</LogicalName>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Register.resx">
       <DependentUpon>Forms\Register.h</DependentUpon>
+      <LogicalName>PMST.Register.resources</LogicalName>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <!-- Icon and image resources -->
@@ -233,6 +265,7 @@
   </ItemGroup>
   <!-- Build output artifacts (ignored in source control) -->
   <ItemGroup>
+    <None Include="..\x64\Debug\MySql.Data.dll" />
     <None Include="lib\SQLite.Interop.dll" />
     <None Include="lib\System.Data.SQLite.dll" />
     <None Include="lib\System.Data.SQLite.dll.config" />
@@ -246,10 +279,8 @@
   <!-- Object files -->
   <ItemGroup>
     <Object Include="x64\Debug\.NETFramework,Version=v4.8.AssemblyAttributes.obj" />
-    <Object Include="x64\Debug\Dashboard.obj" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="x64\Debug\PMST.Build.CppClean.log" />
     <Text Include="x64\Debug\PMST.log" />
     <Text Include="x64\Debug\PMST.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
