@@ -3,6 +3,8 @@
 A desktop application built with **C++** and **CLI WinForms**, designed to streamline pharmacy operations including inventory control, sales, and supplier management.
 
 ---
+![Start](https://img.shields.io/badge/Start-12/02/2024-4CAF50?style=for-the-badge)
+![End](https://img.shields.io/badge/End-12/05/2025-F44336?style=for-the-badge)
 
 ##  Tech Stack
 ![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
