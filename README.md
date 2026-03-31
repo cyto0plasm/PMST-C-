@@ -8,7 +8,7 @@ A desktop application built with **C++** and **CLI WinForms**, designed to strea
 ![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
 ![CLI](https://img.shields.io/badge/CLI-4D4D4D?style=for-the-badge&logo=windows-terminal&logoColor=white)
 ![WinForms](https://img.shields.io/badge/WinForms-.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
-
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
 - **Language:** C++
 - **UI Framework:** CLI WinForms
 - **Architecture:** MVC (Model-View-Controller)
